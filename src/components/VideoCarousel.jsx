@@ -67,7 +67,7 @@ const VideoCarousel = () => {
                   : '4vw'
             });
           }
-        }, 
+        },
         onComplete: () => {
           if(isPlaying) {
             gsap.to(videoDivRef.current[videoId], {
@@ -127,7 +127,7 @@ const VideoCarousel = () => {
       case 'pause':
         setVideo((prevVideo) => ({ ...prevVideo,
           isPlaying: !prevVideo.isPlaying}));
-        break;  
+        break;
       default:
         return video;
     }
