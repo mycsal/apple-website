@@ -1,8 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
 import { highlightsSlides } from '../constants'
 import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/all';
 import { pauseImg, playImg, replayImg } from '../utils';
 import { useGSAP } from '@gsap/react';
+
+gsap.registerPlugin(ScrollTrigger);
 
 const VideoCarousel = () => {
   const videoRef = useRef([]);
@@ -21,35 +24,25 @@ const VideoCarousel = () => {
   const {isEnd, isLastVideo, startPlay, videoId, isPlaying} = video;
 
   useGSAP(() => {
-    gsap.to('#slider', {
+    gsap.to("#slider", {
       transform: `translateX(${-100 * videoId}%)`,
       duration: 2,
-      ease: 'power2.inOut',
-    })
-    gsap.to('#video', {
+      ease: "power2.inOut",
+    });
+    gsap.to("#video", {
       scrollTrigger: {
-        trigger: '#video',
-        toggleActions: 'restart none none none'
+        trigger: "#video",
+        toggleActions: "restart none none none"
       },
       onComplete: () => {
         setVideo((prevVideo) => ({
           ...prevVideo,
           startPlay: true,
           isPlaying: true,
-        }))
+        }));
       },
     });
   }, [isEnd, videoId])
-
-  useEffect(() => {
-    if(loadedData.length > 3) {
-      if(!isPlaying) {
-        videoRef.current[videoId].pause();
-      } else {
-        startPlay && videoRef.current[videoId].play();
-      }
-    }
-  }, [startPlay, videoId, isPlaying, loadedData]);
 
   const handleLoadedMetadata = (i, e) =>
     setLoadedData ((pre) =>
@@ -73,20 +66,15 @@ const VideoCarousel = () => {
                   ? '10vw'
                   : '4vw'
             });
-
-            gsap.to(span[videoId], {
-              width: `${currentProgress}%`,
-              backgroundColor: 'white'
-            });
           }
-        },
+        }, 
         onComplete: () => {
           if(isPlaying) {
             gsap.to(videoDivRef.current[videoId], {
-              width: '12px'
+              width: '12px',
             });
             gsap.to(span[videoId], {
-              backgroundColor: '#afafaf'
+              backgroundColor: '#afafaf',
             });
           }
         },
@@ -95,19 +83,29 @@ const VideoCarousel = () => {
       if(videoId === 0) {
         anim.restart();
       }
-    }
 
-    const animUpdate = () => {
-      anim.progress(videoDivRef.current[videoId].currentTime /
-        highlightsSlides[videoId].videoDuration);
+      const animUpdate = () => {
+        anim.progress(videoDivRef.current[videoId].currentTime /
+          highlightsSlides[videoId].videoDuration);
     };
 
-    if(isPlaying){
-      gsap.ticker.add(animUpdate);
-    } else {
-      gsap.ticker.remove(animUpdate);
+      if(isPlaying) {
+        gsap.ticker.add(animUpdate);
+      } else {
+        gsap.ticker.remove(animUpdate);
+      }
     }
-  }, [videoId, startPlay])
+  }, [videoId, startPlay]);
+
+  useEffect(() => {
+    if(loadedData.length > 3) {
+      if(!isPlaying) {
+        videoRef.current[videoId].pause();
+      } else {
+        startPlay && videoRef.current[videoId].play();
+      }
+    }
+  }, [startPlay, videoId, isPlaying, loadedData]);
 
   const handleProcess = (type, i) => {
     switch (type) {
